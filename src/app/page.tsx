@@ -72,8 +72,8 @@ export default function Home() {
               <MapPin className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">🏴‍☠️ Treasure Hunt</h1>
-          <p className="text-gray-300 text-lg">Final Challenge Awaits!</p>
+          <h1 className="text-3xl font-bold text-white mb-2">� Golden Quest</h1>
+          <p className="text-gray-300 text-lg">Ultimate Fresher Challenge!</p>
           <div className="flex justify-center items-center gap-2 mt-3 text-yellow-300">
             <Trophy className="w-5 h-5" />
             <span className="text-sm font-medium">First to login wins!</span>

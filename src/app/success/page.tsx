@@ -61,9 +61,9 @@ export default function SuccessPage() {
         </div>
 
         <p className="text-gray-300 text-lg mb-6 leading-relaxed">
-          Your treasure hunt journey has been recorded! 🗝️
+          Your Golden Quest journey has been recorded! 🏆
           <br />
-          Rest assured, the results of the treasure hunt will be announced soon.
+          Rest assured, the results of the challenge will be announced soon.
         </p>
 
         {/* Current Time Display */}
