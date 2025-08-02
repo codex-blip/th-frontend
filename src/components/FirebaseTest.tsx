@@ -27,7 +27,7 @@ export default function FirebaseTest() {
         const docRef = await addDoc(collection(db, 'test'), testDoc);
         console.log('✅ Firebase test successful, document ID:', docRef.id);
         setStatus('firebase');
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('❌ Firebase test failed:', error);
         setStatus('error');
         setErrorMessage(error instanceof Error ? error.message : 'Unknown Firebase error');
