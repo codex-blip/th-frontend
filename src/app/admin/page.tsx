@@ -134,10 +134,15 @@ export default function AdminPage() {
                 Refresh
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
                   if (confirm('Clear all login entries? This cannot be undone!')) {
-                    clearAllEntries();
-                    fetchEntries();
+                    try {
+                      await clearAllEntries();
+                      await fetchEntries();
+                    } catch (error) {
+                      console.error('Error clearing entries:', error);
+                      alert('Failed to clear entries. Please try again.');
+                    }
                   }
                 }}
                 className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"

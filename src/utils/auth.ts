@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { LoginEntry, User } from '@/types';
 
@@ -135,7 +135,26 @@ export const getLoginEntries = async (): Promise<LoginEntry[]> => {
 };
 
 // Utility function to clear all entries (for testing)
-export const clearAllEntries = (): void => {
+export const clearAllEntries = async (): Promise<void> => {
+  try {
+    // Clear Firebase first if available
+    if (db) {
+      const q = query(collection(db, 'loginEntries'), orderBy('timestamp', 'desc'));
+      const querySnapshot = await getDocs(q);
+      
+      // Delete all documents
+      const deletePromises = querySnapshot.docs.map(docSnap => 
+        deleteDoc(doc(db!, 'loginEntries', docSnap.id))
+      );
+      
+      await Promise.all(deletePromises);
+      console.log(`🧹 Cleared ${querySnapshot.docs.length} entries from Firebase`);
+    }
+  } catch (error) {
+    console.error('❌ Error clearing Firebase entries:', error);
+  }
+  
+  // Also clear localStorage as backup
   localStorage.removeItem('treasure_hunt_logins');
   console.log('🧹 All localStorage entries cleared');
 };
