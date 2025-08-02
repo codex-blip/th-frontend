@@ -33,7 +33,7 @@ export default function Home() {
         return;
       }
 
-      // Save login entry to localStorage (temporary solution)
+      // Save login entry (Firebase with localStorage fallback)
       await saveLoginEntry(teamCaptainEntry || 'Admin Login', user.type);
       
       console.log('✅ Login successful for:', user.type, teamCaptainEntry || 'Admin Login');

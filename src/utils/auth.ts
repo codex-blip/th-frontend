@@ -1,3 +1,5 @@
+import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { LoginEntry, User } from '@/types';
 
 // Predefined users
@@ -32,12 +34,10 @@ export const formatIST = (timestamp: number): string => {
   });
 };
 
-// Temporary localStorage-based storage (will work immediately)
-// TODO: Replace with Firebase once configured
+// Firebase-based storage with localStorage fallback
 export const saveLoginEntry = async (teamCaptainEntry: string, type: 'fresher' | 'admin'): Promise<void> => {
   const timestamp = Date.now();
   const entry: LoginEntry = {
-    id: `entry_${timestamp}_${Math.random().toString(36).substr(2, 9)}`,
     teamCaptainEntry,
     timestamp,
     formattedTime: formatIST(timestamp),
@@ -45,38 +45,62 @@ export const saveLoginEntry = async (teamCaptainEntry: string, type: 'fresher' |
   };
 
   try {
-    // Get existing entries from localStorage
-    const existingEntries = localStorage.getItem('treasure_hunt_logins');
-    const entries: LoginEntry[] = existingEntries ? JSON.parse(existingEntries) : [];
-    
-    // Add new entry
-    entries.push(entry);
-    
-    // Save back to localStorage
-    localStorage.setItem('treasure_hunt_logins', JSON.stringify(entries));
-    
-    console.log('✅ Login entry saved successfully:', entry);
+    // Try Firebase first
+    await addDoc(collection(db, 'loginEntries'), entry);
+    console.log('✅ Login entry saved to Firebase:', entry);
   } catch (error) {
-    console.error('❌ Error saving login entry:', error);
-    throw error;
+    console.warn('⚠️ Firebase failed, using localStorage fallback:', error);
+    
+    // Fallback to localStorage if Firebase fails
+    try {
+      const existingEntries = localStorage.getItem('treasure_hunt_logins');
+      const entries: LoginEntry[] = existingEntries ? JSON.parse(existingEntries) : [];
+      
+      const entryWithId = {
+        ...entry,
+        id: `entry_${timestamp}_${Math.random().toString(36).substr(2, 9)}`
+      };
+      
+      entries.push(entryWithId);
+      localStorage.setItem('treasure_hunt_logins', JSON.stringify(entries));
+      console.log('✅ Login entry saved to localStorage:', entryWithId);
+    } catch (localError) {
+      console.error('❌ Both Firebase and localStorage failed:', localError);
+      throw localError;
+    }
   }
 };
 
 export const getLoginEntries = async (): Promise<LoginEntry[]> => {
   try {
-    const existingEntries = localStorage.getItem('treasure_hunt_logins');
-    const entries: LoginEntry[] = existingEntries ? JSON.parse(existingEntries) : [];
+    // Try Firebase first
+    const q = query(collection(db, 'loginEntries'), orderBy('timestamp', 'asc'));
+    const querySnapshot = await getDocs(q);
+    const firebaseEntries = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as LoginEntry));
     
-    // Sort by timestamp (earliest first)
-    return entries.sort((a, b) => a.timestamp - b.timestamp);
+    console.log('✅ Loaded entries from Firebase:', firebaseEntries.length);
+    return firebaseEntries;
   } catch (error) {
-    console.error('❌ Error fetching login entries:', error);
-    return [];
+    console.warn('⚠️ Firebase failed, using localStorage fallback:', error);
+    
+    // Fallback to localStorage if Firebase fails
+    try {
+      const existingEntries = localStorage.getItem('treasure_hunt_logins');
+      const entries: LoginEntry[] = existingEntries ? JSON.parse(existingEntries) : [];
+      console.log('✅ Loaded entries from localStorage:', entries.length);
+      return entries.sort((a, b) => a.timestamp - b.timestamp);
+    } catch (localError) {
+      console.error('❌ Both Firebase and localStorage failed:', localError);
+      return [];
+    }
   }
 };
 
 // Utility function to clear all entries (for testing)
 export const clearAllEntries = (): void => {
   localStorage.removeItem('treasure_hunt_logins');
-  console.log('🧹 All login entries cleared');
+  console.log('🧹 All localStorage entries cleared');
 };

@@ -11,14 +11,23 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'firebase' | 'localStorage' | 'unknown'>('unknown');
 
   const fetchEntries = async () => {
     try {
       setRefreshing(true);
       const entries = await getLoginEntries();
       setLoginEntries(entries);
+      
+      // Detect connection method based on console logs or try a simple test
+      if (entries.length > 0 && entries[0].id && entries[0].id.startsWith('entry_')) {
+        setConnectionStatus('localStorage');
+      } else {
+        setConnectionStatus('firebase');
+      }
     } catch (error) {
       console.error('Error fetching entries:', error);
+      setConnectionStatus('localStorage');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -117,8 +126,16 @@ export default function AdminPage() {
               <span className="text-yellow-300 font-mono text-xl">{currentTime}</span>
             </div>
             <div className="text-center mt-2">
-              <span className="bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full text-xs border border-orange-500/30">
-                📱 Using Local Storage (Switch to Firebase for production)
+              <span className={`px-3 py-1 rounded-full text-xs border ${
+                connectionStatus === 'firebase' 
+                  ? 'bg-green-500/20 text-green-300 border-green-500/30' 
+                  : connectionStatus === 'localStorage'
+                  ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
+                  : 'bg-gray-500/20 text-gray-300 border-gray-500/30'
+              }`}>
+                {connectionStatus === 'firebase' ? '� Connected to Firebase' : 
+                 connectionStatus === 'localStorage' ? '�📱 Using Local Storage (Setup Firebase for production)' : 
+                 '🔍 Checking connection...'}
               </span>
             </div>
           </div>
