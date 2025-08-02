@@ -5,6 +5,7 @@ import { getLoginEntries, clearAllEntries } from '@/utils/auth';
 import { LoginEntry } from '@/types';
 import { Shield, Clock, Users, Trophy, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
+import FirebaseTest from '@/components/FirebaseTest';
 
 export default function AdminPage() {
   const [loginEntries, setLoginEntries] = useState<LoginEntry[]>([]);
@@ -117,6 +118,9 @@ export default function AdminPage() {
               </Link>
             </div>
           </div>
+
+          {/* Firebase Connection Test */}
+          <FirebaseTest />
 
           {/* Current Time Display */}
           <div className="bg-white/5 border border-white/10 rounded-lg p-4">

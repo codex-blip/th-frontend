@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { getFirestore, Firestore, connectFirestoreEmulator } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -11,18 +11,34 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "demo-app-id"
 };
 
-// Initialize Firebase with proper typing
+// Initialize Firebase with better error handling
 let db: Firestore | undefined;
 let auth: Auth | undefined;
 
 try {
-  const app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  auth = getAuth(app);
-  console.log('✅ Firebase initialized successfully');
+  // Check if we have real Firebase config (not demo values)
+  const hasRealConfig = firebaseConfig.apiKey !== "demo-api-key" && 
+                       firebaseConfig.projectId !== "demo-project-id";
+  
+  if (hasRealConfig) {
+    console.log('🔥 Initializing Firebase with config:', {
+      projectId: firebaseConfig.projectId,
+      authDomain: firebaseConfig.authDomain
+    });
+    
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    auth = getAuth(app);
+    
+    console.log('✅ Firebase initialized successfully');
+  } else {
+    console.warn('⚠️ Using demo Firebase config - localStorage fallback will be used');
+  }
 } catch (error) {
-  console.warn('⚠️ Firebase initialization failed:', error);
+  console.error('❌ Firebase initialization failed:', error);
   console.log('📱 App will use localStorage fallback');
+  db = undefined;
+  auth = undefined;
 }
 
 export { db, auth };
