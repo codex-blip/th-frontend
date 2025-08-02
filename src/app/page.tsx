@@ -76,7 +76,6 @@ export default function Home() {
           <p className="text-gray-300 text-lg">Ultimate Fresher Challenge!</p>
           <div className="flex justify-center items-center gap-2 mt-3 text-yellow-300">
             <Trophy className="w-5 h-5" />
-            <span className="text-sm font-medium">First to login wins!</span>
             <Trophy className="w-5 h-5" />
           </div>
         </div>
@@ -91,7 +90,6 @@ export default function Home() {
             <ul className="text-gray-300 text-sm space-y-1">
               <li>• Use the credentials from your treasure hunt clues</li>
               <li>• <strong>Enter your team captain&apos;s entry number</strong></li>
-              <li>• First team to login successfully wins! 🏆</li>
             </ul>
           </div>
 
