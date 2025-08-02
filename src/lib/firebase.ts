@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
@@ -11,13 +11,12 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "demo-app-id"
 };
 
-// Initialize Firebase
-let app;
-let db;
-let auth;
+// Initialize Firebase with proper typing
+let db: Firestore | undefined;
+let auth: Auth | undefined;
 
 try {
-  app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
   console.log('✅ Firebase initialized successfully');

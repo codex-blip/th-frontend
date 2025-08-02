@@ -45,9 +45,14 @@ export const saveLoginEntry = async (teamCaptainEntry: string, type: 'fresher' |
   };
 
   try {
-    // Try Firebase first
-    await addDoc(collection(db, 'loginEntries'), entry);
-    console.log('✅ Login entry saved to Firebase:', entry);
+    // Try Firebase first (only if db is available)
+    if (db) {
+      await addDoc(collection(db, 'loginEntries'), entry);
+      console.log('✅ Login entry saved to Firebase:', entry);
+      return;
+    } else {
+      throw new Error('Firebase not initialized');
+    }
   } catch (error) {
     console.warn('⚠️ Firebase failed, using localStorage fallback:', error);
     
@@ -73,16 +78,20 @@ export const saveLoginEntry = async (teamCaptainEntry: string, type: 'fresher' |
 
 export const getLoginEntries = async (): Promise<LoginEntry[]> => {
   try {
-    // Try Firebase first
-    const q = query(collection(db, 'loginEntries'), orderBy('timestamp', 'asc'));
-    const querySnapshot = await getDocs(q);
-    const firebaseEntries = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as LoginEntry));
-    
-    console.log('✅ Loaded entries from Firebase:', firebaseEntries.length);
-    return firebaseEntries;
+    // Try Firebase first (only if db is available)
+    if (db) {
+      const q = query(collection(db, 'loginEntries'), orderBy('timestamp', 'asc'));
+      const querySnapshot = await getDocs(q);
+      const firebaseEntries = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as LoginEntry));
+      
+      console.log('✅ Loaded entries from Firebase:', firebaseEntries.length);
+      return firebaseEntries;
+    } else {
+      throw new Error('Firebase not initialized');
+    }
   } catch (error) {
     console.warn('⚠️ Firebase failed, using localStorage fallback:', error);
     
