@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authenticateUser, saveLoginEntry } from '@/utils/auth';
+import { authenticateUser, saveLoginEntry, setUserSession } from '@/utils/auth';
 import { MapPin, Key, Users, Trophy } from 'lucide-react';
 
 export default function Home() {
@@ -35,6 +35,9 @@ export default function Home() {
 
       // Save login entry (Firebase with localStorage fallback)
       await saveLoginEntry(teamCaptainEntry || 'Admin Login', user.type);
+      
+      // Set user session
+      setUserSession(user);
       
       console.log('✅ Login successful for:', user.type, teamCaptainEntry || 'Admin Login');
 

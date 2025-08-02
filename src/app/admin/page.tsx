@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getLoginEntries, clearAllEntries } from '@/utils/auth';
+import { useRouter } from 'next/navigation';
+import { getLoginEntries, clearAllEntries, isAdminAuthenticated, clearUserSession } from '@/utils/auth';
 import { LoginEntry } from '@/types';
-import { Shield, Clock, Users, Trophy, RefreshCw, Home } from 'lucide-react';
+import { Shield, Clock, Users, Trophy, RefreshCw, Home, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import FirebaseTest from '@/components/FirebaseTest';
 
@@ -13,6 +14,21 @@ export default function AdminPage() {
   const [currentTime, setCurrentTime] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'firebase' | 'localStorage' | 'unknown'>('unknown');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const checkAuth = () => {
+      if (!isAdminAuthenticated()) {
+        router.push('/');
+        return;
+      }
+      setIsAuthenticated(true);
+    };
+    
+    checkAuth();
+  }, [router]);
 
   const fetchEntries = async () => {
     try {
@@ -36,8 +52,10 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    fetchEntries();
-  }, []);
+    if (isAuthenticated) {
+      fetchEntries();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const updateTime = () => {
@@ -62,6 +80,23 @@ export default function AdminPage() {
 
   const fresherEntries = loginEntries.filter(entry => entry.type === 'fresher');
   const adminEntries = loginEntries.filter(entry => entry.type === 'admin');
+
+  const handleLogout = () => {
+    clearUserSession();
+    router.push('/');
+  };
+
+  // Show loading while checking authentication
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-xl">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -108,6 +143,13 @@ export default function AdminPage() {
                 className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 🧹 Clear Data
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Logout
               </button>
               <Link 
                 href="/"

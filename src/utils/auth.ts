@@ -20,6 +20,32 @@ export const authenticateUser = (username: string, password: string): User | nul
   return USERS.find(user => user.username === username && user.password === password) || null;
 };
 
+// Session management
+export const setUserSession = (user: User): void => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+  }
+};
+
+export const getUserSession = (): User | null => {
+  if (typeof window !== 'undefined') {
+    const userStr = sessionStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+  return null;
+};
+
+export const clearUserSession = (): void => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.removeItem('currentUser');
+  }
+};
+
+export const isAdminAuthenticated = (): boolean => {
+  const user = getUserSession();
+  return user?.type === 'admin';
+};
+
 export const formatIST = (timestamp: number): string => {
   const date = new Date(timestamp);
   return date.toLocaleString('en-IN', {
