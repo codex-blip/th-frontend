@@ -61,7 +61,7 @@ export default function SuccessPage() {
         </div>
 
         <p className="text-gray-300 text-lg mb-6 leading-relaxed">
-          The answer’s been quietly waiting, veiled in plain sight.<br />
+          The answer’s been already sent to all, veiled in plain sight.<br />
           <span className="text-300 font-semibold">Only those who notice the unseen will find where to go next. 🕵️‍♂️</span>
         </p>
 
