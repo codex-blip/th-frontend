@@ -6,7 +6,7 @@ import { LoginEntry, User } from '@/types';
 export const USERS: User[] = [
   {
     username: 'ksi',
-    password: 'zerikon',
+    password: 'paragraph',
     type: 'fresher'
   },
   {
