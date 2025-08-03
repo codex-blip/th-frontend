@@ -5,8 +5,8 @@ import { LoginEntry, User } from '@/types';
 // Predefined users
 export const USERS: User[] = [
   {
-    username: 'esportz@ismp',
-    password: 'iitropargoat',
+    username: 'ksi',
+    password: 'zerikon',
     type: 'fresher'
   },
   {
